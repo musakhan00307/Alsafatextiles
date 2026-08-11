@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al Safa Textiles</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f7f6f2;color:#1d2a24}
+header{background:#18352b;color:#fff;padding:20px 5%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.logo{font-size:24px;font-weight:700;letter-spacing:.5px}.tag{font-size:12px;color:#d9c58b}
+.hero{padding:70px 5%;background:linear-gradient(135deg,#18352b,#2d5445);color:white}
+.hero h1{font-size:clamp(36px,7vw,64px);margin:0 0 12px}.hero p{max-width:650px;line-height:1.6;color:#e6eee9}
+.container{width:min(1180px,90%);margin:35px auto}.tools{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:25px}
+input,select,button{padding:13px 15px;border-radius:10px;border:1px solid #d8d5cb;font-size:15px}
+input{flex:1;min-width:220px}button{cursor:pointer;background:#18352b;color:#fff;border:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.card{background:white;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px #00000010}.pic{height:230px;background:#ddd;display:flex;align-items:center;justify-content:center;color:#777;font-size:14px}.pic img{width:100%;height:100%;object-fit:cover}
+.info{padding:17px}.code{font-size:12px;color:#777}.info h3{margin:6px 0}.meta{color:#53635c;font-size:14px;line-height:1.6}.price{font-weight:bold;margin-top:10px}.status{display:inline-block;margin-top:10px;padding:5px 9px;border-radius:20px;background:#e3f2e9;color:#1d6b43;font-size:12px}
+.empty{text-align:center;padding:60px;color:#777}
+footer{margin-top:60px;background:#18352b;color:white;text-align:center;padding:30px}
+.admin{margin-top:35px;padding:22px;background:white;border-radius:16px}.admin h2{margin-top:0}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.row input,.row select{width:100%}.small{font-size:12px;color:#777;margin:10px 0}
+</style>
+</head>
+<body>
+<header><div class="logo">AL SAFA TEXTILES <span class="tag">PREMIUM FABRICS</span></div><div>Catalog</div></header>
+
+<section class="hero">
+<h1>Al Safa Textiles</h1>
+<p>Explore our latest fabric collection online. View available articles, colors and details — no need to request sample pictures one by one.</p>
+</section>
+
+<main class="container">
+<div class="tools">
+<input id="search" placeholder="Search article, fabric or color...">
+<select id="category"><option value="">All categories</option><option>Cotton</option><option>Polyester</option><option>Lawn</option><option>Khaddar</option><option>Other</option></select>
+</div>
+<div id="grid" class="grid"></div>
+
+<section class="admin">
+<h2>Admin — Add Product</h2>
+<p class="small">Demo admin panel. Products are saved in this browser only. For a live website, connect this form to hosting/database.</p>
+<div class="row">
+<input id="code" placeholder="Article code">
+<input id="name" placeholder="Product name">
+<select id="cat"><option>Cotton</option><option>Polyester</option><option>Lawn</option><option>Khaddar</option><option>Other</option></select>
+<input id="color" placeholder="Colors">
+<input id="width" placeholder='Width e.g. 58"'>
+<input id="price" placeholder="Price (optional)">
+<input id="image" type="file" accept="image/*">
+</div>
+<button style="margin-top:12px" onclick="addProduct()">Add Product</button>
+</section>
+</main>
+
+<footer>© 2026 Al Safa Textiles — All Rights Reserved</footer>
+
+<script>
+const defaultProducts=[
+ {code:"AST-001",name:"Premium Cotton",cat:"Cotton",color:"White, Black, Navy",width:'58"',price:"Contact for Price",image:""},
+ {code:"AST-002",name:"Premium Fabric",cat:"Other",color:"Multiple Colors",width:'58"',price:"Contact for Price",image:""}
+];
+let products=JSON.parse(localStorage.getItem("alSafaProducts")||"null")||defaultProducts;
+function save(){localStorage.setItem("alSafaProducts",JSON.stringify(products));render()}
+function render(){
+ const q=document.getElementById("search").value.toLowerCase(), c=document.getElementById("category").value;
+ const list=products.filter(p=>(!c||p.cat===c)&&[p.code,p.name,p.cat,p.color].join(" ").toLowerCase().includes(q));
+ const grid=document.getElementById("grid");
+ grid.innerHTML=list.length?list.map((p,i)=>`<article class="card"><div class="pic">${p.image?`<img src="${p.image}" alt="${p.name}">`:"Fabric Photo"}</div><div class="info"><div class="code">${p.code}</div><h3>${p.name}</h3><div class="meta">Category: ${p.cat}<br>Colors: ${p.color}<br>Width: ${p.width}</div><div class="price">${p.price||"Contact for Price"}</div><span class="status">Available</span></div></article>`).join(""):`<div class="empty">No available products found.</div>`;
+}
+async function addProduct(){
+ const file=document.getElementById("image").files[0]; let image="";
+ if(file) image=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(file)});
+ const p={code:code.value||"AST-"+Date.now(),name:name.value||"New Fabric",cat:cat.value,color:color.value||"—",width:width.value||"—",price:price.value||"Contact for Price",image};
+ products.unshift(p);save();
+ document.querySelectorAll(".admin input").forEach(x=>x.value="");
+}
+search.oninput=render;category.onchange=render;render();
+</script>
+</body>
+</html>
